@@ -1,0 +1,35 @@
+# Python and local environments
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Credentials and machine-specific settings
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Downloaded datasets, including existing snapshots
+/data/**
+/data_v*/
+/data_v*.zip
+
+# Generated pipeline outputs
+/results/**
+/cleaning_reports/**
+*.log
+*.tmp
+spark-warehouse/
+metastore_db/
+derby.log
