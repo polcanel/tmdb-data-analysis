@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: tmdb_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: dockerfile.pipeline
+    container_name: tmdb_pipeline
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+    volumes:
+      - ./data:/app/data
+      - ./docs:/app/docs
+    depends_on:
+      mongo:
+        condition: service_healthy
+    command: python src/preparation/tmdb_clean_load.py --input data/movies.jsonl --database tmdb_coursework --collection movies_clean
+
+  web:
+    build:
+      context: .
+      dockerfile: dockerfile.web
+    container_name: tmdb_web
+    ports:
+      - "8501:8501"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      - mongo
+    profiles:
+      - web
+
+volumes:
+  mongo_data:
